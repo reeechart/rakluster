@@ -14,12 +14,12 @@ class DBSCAN:
             self.metric_func = euclidean_distances
         self.metric = metric
     
-    def expand(self, index, root):
+    def __expand__(self, index, root):
         for i in self.core_list[root]:
             if(self.result[i] == -1):
                 self.result[i] = index
                 if(i in self.core_list):
-                    self.expand(index, i)
+                    self.__expand__(index, i)
 
     def fit(self, X):
         print("Start Fitting")
@@ -41,7 +41,7 @@ class DBSCAN:
         idx = 0
         for i in core_list:
             if(self.result[i] == -1):
-                self.expand(idx,i)
+                self.__expand__(idx,i)
                 idx = idx + 1
         self.labels_ = numpy.array(list(self.result.values()))
         return self
