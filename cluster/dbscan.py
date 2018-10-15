@@ -22,10 +22,9 @@ class DBSCAN:
                     self.__expand__(index, i)
 
     def fit(self, X):
-        print("Start Fitting")
-        self.result = {}
+        self.result = []
         for i in range(len(X)):
-            self.result[i] = -1
+            self.result.append(-1)
         distances_matrix = self.metric_func(X)
         #Finding Core
         core_list = {}
@@ -43,5 +42,5 @@ class DBSCAN:
             if(self.result[i] == -1):
                 self.__expand__(idx,i)
                 idx = idx + 1
-        self.labels_ = numpy.array(list(self.result.values()))
+        self.labels_ = numpy.array(self.result)
         return self
