@@ -120,7 +120,30 @@ class AgglomerativeClustering:
         self.clusters_distance = np.array(distance_matrix)
 
     def compute_average_group_distance(self, data):
-        print('z')
+        distance_matrix = []
+        attr_len = len(data[0])
+        for i in range(len(self.clusters)):
+            row_distance = []
+            for j in range(len(self.clusters)):
+                row_distance.append(0)
+            distance_matrix.append(row_distance)
+        for i in range(len(self.clusters)-1):
+            for j in range(i+1, len(self.clusters)):
+                i_sum_member = []
+                j_sum_member = []
+                for _ in range(attr_len):
+                    i_sum_member.append(0)
+                    j_sum_member.append(0)
+                for i_member_idx in self.clusters[i]:
+                    i_sum_member = [x + y for x,y in zip(i_sum_member, data[i_member_idx])]
+                for j_member_idx in self.clusters[j]:
+                    j_sum_member = [x + y for x,y in zip(j_sum_member, data[j_member_idx])]
+                i_cluster_means = [x/len(self.clusters[i]) for x in i_sum_member]
+                j_cluster_means = [x/len(self.clusters[j]) for x in j_sum_member]
+                cluster_distance = distance.euclidean(i_cluster_means, j_cluster_means)
+                distance_matrix[i][j] = cluster_distance
+                distance_matrix[j][i] = cluster_distance
+        self.clusters_distance = np.array(distance_matrix)
 
     def convert_labels(self, data):
         for data_idx in range(len(data)):
