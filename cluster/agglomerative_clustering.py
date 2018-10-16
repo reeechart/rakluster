@@ -14,6 +14,7 @@ class AgglomerativeClustering:
         self.check_validity()
         self.clusters = []
         self.clusters_distance = []
+        self.labels_ = []
 
     def check_validity(self):
         if (self.n_clusters < 1):
@@ -37,6 +38,7 @@ class AgglomerativeClustering:
             row_idx, col_idx = self.get_next_clustered_indices()
             print(row_idx, col_idx)
             self.merge_cluster(data, row_idx, col_idx)
+        self.convert_labels(data)
 
     def get_next_clustered_indices(self):
         minimum_distance = np.infty
@@ -104,3 +106,9 @@ class AgglomerativeClustering:
 
     def compute_average_group_distance(self, data):
         print('z')
+
+    def convert_labels(self, data):
+        for data_idx in range(len(data)):
+            for cluster_idx in range(len(self.clusters)):
+                if data_idx in self.clusters[cluster_idx]:
+                    self.labels_.append(cluster_idx)
