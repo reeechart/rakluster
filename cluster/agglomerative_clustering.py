@@ -1,3 +1,6 @@
+from scipy.spatial import distance
+import numpy as np
+
 class AgglomerativeClustering:
     SINGLE_LINKAGE = 'single'
     AVERAGE_LINKAGE = 'average'
@@ -5,12 +8,12 @@ class AgglomerativeClustering:
     COMPLETE_LINKAGE = 'complete'
     LINKAGES = [SINGLE_LINKAGE, AVERAGE_LINKAGE, AVERAGE_GROUP_LINKAGE, COMPLETE_LINKAGE]
 
-    clusters = []
-
     def __init__(self, n_clusters, linkage=SINGLE_LINKAGE):
         self.n_clusters = n_clusters
         self.linkage = linkage
         self.check_validity()
+        self.clusters = []
+        self.clusters_distance = []
 
     def check_validity(self):
         if (self.n_clusters < 1):
@@ -20,28 +23,72 @@ class AgglomerativeClustering:
 
     def initiate(self, data):
         for index in range(len(data)):
+            distances = []
             cluster = [index]
             self.clusters.append(cluster)
+            for pair in range(len(data)):
+                distances.append(distance.euclidean(data[index], data[pair]))
+            self.clusters_distance.append(distances)
+        self.clusters_distance = np.array(self.clusters_distance)
 
     def fit(self, data):
         self.initiate(data)
+        while(len(self.clusters) > self.n_clusters):
+            first_idx, second_idx = self.get_next_clustered_indices()
+            print(first_idx, second_idx)
+            self.merge_cluster(data, first_idx, second_idx)
+
+    def get_next_clustered_indices(self):
+        minimum_distance = np.infty
+        row_index = -1
+        col_index = -1
+        for i in range(len(self.clusters)-1):
+            for j in range(i+1, len(self.clusters)):
+                if (self.clusters_distance[i][j] < minimum_distance):
+                    minimum_distance = self.clusters_distance[i][j]
+                    row_index = i
+                    col_index = j
+        return row_index, col_index
+
+    def merge_cluster(self, data, first_idx, second_idx):
+        self.clusters[first_idx] += self.clusters[second_idx]
+        self.clusters.pop(second_idx)
+        self.compute_distance(data, first_idx, second_idx)
+
+    def compute_distance(self, data, first_idx, second_idx):
         if (self.linkage == self.SINGLE_LINKAGE):
-            self.single_fit(data)
+            self.compute_single_distance(data, first_idx, second_idx)
         elif (self.linkage == self.COMPLETE_LINKAGE):
-            self.complete_fit(data)
+            self.compute_complete_distance(data)
         elif (self.linkage == self.AVERAGE_LINKAGE):
-            self.average_fit(data)
+            self.compute_average_distance(data)
         elif (self.linkage == self.AVERAGE_GROUP_LINKAGE):
-            self.average_group_fit(data)
-    
-    def single_fit(self, data):
-        print('a')
+            self.compute_average_group_distance(data)
+        
+    def compute_single_distance(self, data, first_idx, second_idx):
+        print('w')
 
-    def complete_fit(self, data):
-        print('b')
+        row = self.clusters_distance[first_idx, :]
+        col = self.clusters_distance[:, second_idx]
 
-    def average_fit(self, data):
-        print('c')
+        min_val = np.minimum(row, col)
+        min_val = np.delete(min_val, second_idx, 0)
+
+        self.clusters_distance = np.delete(self.clusters_distance, second_idx, axis=1)
+        self.clusters_distance = np.delete(self.clusters_distance, second_idx, axis=0)
+        self.clusters_distance = np.delete(self.clusters_distance, first_idx, axis=1)
+        self.clusters_distance = np.delete(self.clusters_distance, first_idx, axis=0)
+
+        min_row = np.delete(min_val, first_idx, axis=0).tolist()
+        self.clusters_distance = np.insert(self.clusters_distance, first_idx, min_row, axis=0)
+        self.clusters_distance = np.insert(self.clusters_distance, first_idx, min_val, axis=1)
+        print(len(self.clusters_distance))
+
+    def compute_complete_distance(self, data):
+        print('x')
     
-    def average_group_fit(self, data):
-        print('d')
+    def compute_average_distance(self, data):
+        print('y')
+
+    def compute_average_group_distance(self, data):
+        print('z')
