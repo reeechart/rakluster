@@ -34,9 +34,9 @@ class AgglomerativeClustering:
     def fit(self, data):
         self.initiate(data)
         while(len(self.clusters) > self.n_clusters):
-            first_idx, second_idx = self.get_next_clustered_indices()
-            print(first_idx, second_idx)
-            self.merge_cluster(data, first_idx, second_idx)
+            row_idx, second_idx = self.get_next_clustered_indices()
+            print(row_idx, second_idx)
+            self.merge_cluster(data, row_idx, second_idx)
 
     def get_next_clustered_indices(self):
         minimum_distance = np.infty
@@ -50,14 +50,14 @@ class AgglomerativeClustering:
                     col_index = j
         return row_index, col_index
 
-    def merge_cluster(self, data, first_idx, second_idx):
-        self.clusters[first_idx] += self.clusters[second_idx]
+    def merge_cluster(self, data, row_idx, second_idx):
+        self.clusters[row_idx] += self.clusters[second_idx]
         self.clusters.pop(second_idx)
-        self.compute_distance(data, first_idx, second_idx)
+        self.compute_distance(data, row_idx, second_idx)
 
-    def compute_distance(self, data, first_idx, second_idx):
+    def compute_distance(self, data, row_idx, second_idx):
         if (self.linkage == self.SINGLE_LINKAGE):
-            self.compute_single_distance(data, first_idx, second_idx)
+            self.compute_single_distance(data, row_idx, second_idx)
         elif (self.linkage == self.COMPLETE_LINKAGE):
             self.compute_complete_distance(data)
         elif (self.linkage == self.AVERAGE_LINKAGE):
@@ -65,10 +65,10 @@ class AgglomerativeClustering:
         elif (self.linkage == self.AVERAGE_GROUP_LINKAGE):
             self.compute_average_group_distance(data)
         
-    def compute_single_distance(self, data, first_idx, second_idx):
+    def compute_single_distance(self, data, row_idx, second_idx):
         print('w')
 
-        row = self.clusters_distance[first_idx, :]
+        row = self.clusters_distance[row_idx, :]
         col = self.clusters_distance[:, second_idx]
 
         min_val = np.minimum(row, col)
@@ -76,12 +76,12 @@ class AgglomerativeClustering:
 
         self.clusters_distance = np.delete(self.clusters_distance, second_idx, axis=1)
         self.clusters_distance = np.delete(self.clusters_distance, second_idx, axis=0)
-        self.clusters_distance = np.delete(self.clusters_distance, first_idx, axis=1)
-        self.clusters_distance = np.delete(self.clusters_distance, first_idx, axis=0)
+        self.clusters_distance = np.delete(self.clusters_distance, row_idx, axis=1)
+        self.clusters_distance = np.delete(self.clusters_distance, row_idx, axis=0)
 
-        min_row = np.delete(min_val, first_idx, axis=0).tolist()
-        self.clusters_distance = np.insert(self.clusters_distance, first_idx, min_row, axis=0)
-        self.clusters_distance = np.insert(self.clusters_distance, first_idx, min_val, axis=1)
+        min_row = np.delete(min_val, row_idx, axis=0).tolist()
+        self.clusters_distance = np.insert(self.clusters_distance, row_idx, min_row, axis=0)
+        self.clusters_distance = np.insert(self.clusters_distance, row_idx, min_val, axis=1)
         print(len(self.clusters_distance))
 
     def compute_complete_distance(self, data):
