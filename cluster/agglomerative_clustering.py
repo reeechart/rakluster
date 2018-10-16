@@ -102,7 +102,22 @@ class AgglomerativeClustering:
         print(len(self.clusters_distance))
     
     def compute_average_distance(self, data):
-        print('y')
+        distance_matrix = []
+        for i in range(len(self.clusters)):
+            row_distance = []
+            for j in range(len(self.clusters)):
+                row_distance.append(0)
+            distance_matrix.append(row_distance)
+        for i in range(len(self.clusters)-1):
+            for j in range(i+1, len(self.clusters)):
+                sum_distance = 0
+                for i_member_idx in self.clusters[i]:
+                    for j_member_idx in self.clusters[j]:
+                        sum_distance += distance.euclidean(data[i_member_idx], data[j_member_idx])
+                avg_distance = sum_distance/(len(self.clusters[i]) + len(self.clusters[j]))
+                distance_matrix[i][j] = avg_distance
+                distance_matrix[j][i] = avg_distance
+        self.clusters_distance = np.array(distance_matrix)
 
     def compute_average_group_distance(self, data):
         print('z')
