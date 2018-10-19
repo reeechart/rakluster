@@ -1,5 +1,5 @@
 import numpy as np
-import copy
+
 class KMeans:
     def __init__(self, n_clusters, max_iter=100):
         self.n_clusters = n_clusters
@@ -11,7 +11,7 @@ class KMeans:
     def init_centroid(self,data,n_clusters):
         idx = np.sort(np.random.choice(len(data), n_clusters, replace=False))
         self.centroid = np.array(data)[idx].tolist()
-        print(self.centroid)
+
         return self.centroid
 
     def euclidean_dst(self,x,y):
@@ -51,7 +51,7 @@ class KMeans:
 
         while not convergance:
             if (iteration > 0) :
-                self.centroid = self.next_centroid.copy()
+                self.centroid = self.next_centroid
                 
             self.next_centroid = []
             self.label = []
