@@ -36,7 +36,6 @@ class AgglomerativeClustering:
         self.initiate(data)
         while(len(self.clusters) > self.n_clusters):
             row_idx, col_idx = self.get_next_clustered_indices()
-            print(row_idx, col_idx)
             self.merge_cluster(data, row_idx, col_idx)
         self.convert_labels(data)
 
@@ -82,7 +81,6 @@ class AgglomerativeClustering:
         min_row = np.delete(min_val, row_idx, axis=0).tolist()
         self.clusters_distance = np.insert(self.clusters_distance, row_idx, min_row, axis=0)
         self.clusters_distance = np.insert(self.clusters_distance, row_idx, min_val, axis=1)
-        print(len(self.clusters_distance))
 
     def compute_complete_distance(self, data, row_idx, col_idx):
         row = self.clusters_distance[row_idx, :]
@@ -99,7 +97,6 @@ class AgglomerativeClustering:
         min_row = np.delete(min_val, row_idx, axis=0).tolist()
         self.clusters_distance = np.insert(self.clusters_distance, row_idx, min_row, axis=0)
         self.clusters_distance = np.insert(self.clusters_distance, row_idx, min_val, axis=1)
-        print(len(self.clusters_distance))
     
     def compute_average_distance(self, data):
         distance_matrix = []
@@ -150,3 +147,4 @@ class AgglomerativeClustering:
             for cluster_idx in range(len(self.clusters)):
                 if data_idx in self.clusters[cluster_idx]:
                     self.labels_.append(cluster_idx)
+        self.labels_ = np.array(self.labels_)
