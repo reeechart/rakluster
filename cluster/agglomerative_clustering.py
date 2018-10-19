@@ -8,9 +8,14 @@ class AgglomerativeClustering:
     COMPLETE_LINKAGE = 'complete'
     LINKAGES = [SINGLE_LINKAGE, AVERAGE_LINKAGE, AVERAGE_GROUP_LINKAGE, COMPLETE_LINKAGE]
 
-    def __init__(self, n_clusters, linkage=SINGLE_LINKAGE):
+    EUCLIDEAN_DISTANCE = 'euclidean'
+    MANHATTAN_DISTANCE = 'manhattan'
+    AFFINITY_LIST = [EUCLIDEAN_DISTANCE, MANHATTAN_DISTANCE]
+
+    def __init__(self, n_clusters, linkage=SINGLE_LINKAGE, affinity=EUCLIDEAN_DISTANCE):
         self.n_clusters = n_clusters
         self.linkage = linkage
+        self.affinity = affinity
         self.check_validity()
         self.clusters = []
         self.clusters_distance = []
@@ -21,6 +26,17 @@ class AgglomerativeClustering:
             raise(AttributeError('n_clusters must be positive number'))
         if (self.linkage not in self.LINKAGES):
             raise(AttributeError('Linkage algorithm %s is not available' % self.linkage))
+        if (self.affinity not in self.AFFINITY_LIST):
+            raise(AttributeError('Affinity %s is not supported' % self.affinity))
+
+    def get_distance(self, obj_one, obj_two):
+        if (self.affinity == self.EUCLIDEAN_DISTANCE):
+            return distance.euclidean(obj_one, obj_two)
+        elif (self.affinity == self.MANHATTAN_DISTANCE):
+            dist = 0
+            for i in range(len(obj_one)):
+                dist += abs(obj_one[i] - obj_two[i])
+            return dist
 
     def initiate(self, data):
         for index in range(len(data)):
@@ -28,7 +44,7 @@ class AgglomerativeClustering:
             cluster = [index]
             self.clusters.append(cluster)
             for pair in range(len(data)):
-                distances.append(distance.euclidean(data[index], data[pair]))
+                distances.append(self.get_distance(data[index], data[pair]))
             self.clusters_distance.append(distances)
         self.clusters_distance = np.array(self.clusters_distance)
 
@@ -110,7 +126,7 @@ class AgglomerativeClustering:
                 sum_distance = 0
                 for i_member_idx in self.clusters[i]:
                     for j_member_idx in self.clusters[j]:
-                        sum_distance += distance.euclidean(data[i_member_idx], data[j_member_idx])
+                        sum_distance += self.get_distance(data[i_member_idx], data[j_member_idx])
                 avg_distance = sum_distance/(len(self.clusters[i]) + len(self.clusters[j]))
                 distance_matrix[i][j] = avg_distance
                 distance_matrix[j][i] = avg_distance
@@ -137,7 +153,7 @@ class AgglomerativeClustering:
                     j_sum_member = [x + y for x,y in zip(j_sum_member, data[j_member_idx])]
                 i_cluster_means = [x/len(self.clusters[i]) for x in i_sum_member]
                 j_cluster_means = [x/len(self.clusters[j]) for x in j_sum_member]
-                cluster_distance = distance.euclidean(i_cluster_means, j_cluster_means)
+                cluster_distance = self.get_distance(i_cluster_means, j_cluster_means)
                 distance_matrix[i][j] = cluster_distance
                 distance_matrix[j][i] = cluster_distance
         self.clusters_distance = np.array(distance_matrix)
