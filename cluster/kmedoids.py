@@ -71,7 +71,7 @@ class KMedoids:
                 self.cost = self.next_cost
                 self.idx_centroid = self.idx_next_centroid
                 
-            self.idx_next_centroid = self.new_medoids(label,self.idx_centroid,self.n_clusters)
+            self.idx_next_centroid = self.new_medoids(self.label,self.idx_centroid,self.n_clusters)
             self.label = list(self.get_cluster(self.n_clusters,data[i],self.idx_next_centroid,data) for i in range(len(data)))
             self.next_cost = self.count_cost(self.label,data,self.idx_next_centroid)
             

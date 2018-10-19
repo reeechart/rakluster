@@ -51,7 +51,7 @@ class KMeans:
 
         while not convergance:
             if (iteration > 0) :
-                self.centroid = self.next_centroid.copy()
+                self.centroid = self.next_centroid
                 
             self.next_centroid = []
             self.label = []
