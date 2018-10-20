@@ -164,3 +164,4 @@ class AgglomerativeClustering:
                 if data_idx in self.clusters[cluster_idx]:
                     self.labels_.append(cluster_idx)
         self.labels_ = np.array(self.labels_)
+        
