@@ -6,7 +6,7 @@ class KMeans:
         self.max_iter = max_iter
         self.centroid = []
         self.next_centroid = []
-        self.label = []
+        self.labels_ = []
     
     def init_centroid(self,data,n_clusters):
         idx = np.sort(np.random.choice(len(data), n_clusters, replace=False))
@@ -54,15 +54,13 @@ class KMeans:
                 self.centroid = self.next_centroid
                 
             self.next_centroid = []
-            self.label = []
+            self.labels_ = []
             
-            self.label = list(self.get_cluster(self.n_clusters,data[i],self.centroid) for i in range(len(data)))    
-            self.next_centroid = list(self.calculate_new_centroid(data,self.find_cluster_member(self.label,i)) for i in range(self.n_clusters))
+            self.labels_ = list(self.get_cluster(self.n_clusters,data[i],self.centroid) for i in range(len(data)))
+            self.next_centroid = list(self.calculate_new_centroid(data,self.find_cluster_member(self.labels_,i)) for i in range(self.n_clusters))
             
             iteration += 1
             convergance = (self.centroid == self.next_centroid or iteration >=100)
-            
-        return self.label
     
     def predict(self, instances):
         return self.get_cluster(self.n_clusters, instances, self.centroid)
