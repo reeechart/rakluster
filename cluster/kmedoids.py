@@ -7,15 +7,9 @@ class KMedoids:
         self.idx_next_centroid = []
         self.idx_centroid = []
         self.centroid = []
-        self.label = []
+        self.labels_ = []
         self.cost = 0
         self.next_cost = 0
-    
-#     def init_centroid(self,data,n_clusters):
-#         idx = np.sort(np.random.choice(len(data), n_clusters, replace=False))
-#         self.centroid = np.array(data)[idx].tolist()
-#         print(self.centroid)
-#         return self.centroid
 
     def init_centroid(self,data,n_clusters):
         idx = np.sort(np.random.choice(len(data), n_clusters, replace=False))
@@ -60,8 +54,8 @@ class KMedoids:
     
     def fit(self,data):
         self.idx_centroid = self.init_centroid(data,self.n_clusters)
-        self.label = list(self.get_cluster(self.n_clusters,data[i],self.idx_centroid,data) for i in range(len(data)))
-        self.cost = self.count_cost(self.label,data,self.idx_centroid)
+        self.labels_ = list(self.get_cluster(self.n_clusters,data[i],self.idx_centroid,data) for i in range(len(data)))
+        self.cost = self.count_cost(self.labels_,data,self.idx_centroid)
         self.next_cost = self.cost
         convergance = False
         iteration = 0
@@ -71,17 +65,15 @@ class KMedoids:
                 self.cost = self.next_cost
                 self.idx_centroid = self.idx_next_centroid
                 
-            self.idx_next_centroid = self.new_medoids(self.label,self.idx_centroid,self.n_clusters)
-            self.label = list(self.get_cluster(self.n_clusters,data[i],self.idx_next_centroid,data) for i in range(len(data)))
-            self.next_cost = self.count_cost(self.label,data,self.idx_next_centroid)
+            self.idx_next_centroid = self.new_medoids(self.labels_,self.idx_centroid,self.n_clusters)
+            self.labels_ = list(self.get_cluster(self.n_clusters,data[i],self.idx_next_centroid,data) for i in range(len(data)))
+            self.next_cost = self.count_cost(self.labels_,data,self.idx_next_centroid)
             
             iteration += 1
             convergance = (self.cost <= self.next_cost or iteration >= self.max_iter)
         
-        self.label = list(self.get_cluster(self.n_clusters,data[i],self.idx_next_centroid,data) for i in range(len(data)))
+        self.labels_ = list(self.get_cluster(self.n_clusters,data[i],self.idx_next_centroid,data) for i in range(len(data)))
         self.centroid = list(data[self.idx_next_centroid[i]] for i in range(self.n_clusters))
-        
-        return self.label
     
     def predict(self,instances):
         distance = list(self.manhattan_dst(instances,self.centroid[i]) for i in range(self.n_clusters))
